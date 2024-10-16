@@ -15,17 +15,18 @@
 
         <!-- Top Section (Optional Header) -->
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="116dp"
         android:background="#DDFAF6">
 
         <TextView
             android:id="@+id/track"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="40dp"
-            android:text="Welcome User !"
+            android:text="Welcome"
             android:textSize="30dp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -37,8 +38,9 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="40dp"
             android:text="Say goodbye to procrastination and hello to progress!"
-            app:layout_constraintTop_toBottomOf="@id/track"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/track" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Bottom App Bar with Navigation -->

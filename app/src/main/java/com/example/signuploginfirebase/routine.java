@@ -10,41 +10,61 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class routine extends Fragment { // Updated the class name to follow Java conventions
+public class routine extends Fragment {
 
     private RecyclerView calendarRecyclerView;
     private TextView selectedDateTextView;
     private CalendarAdapter calendarAdapter;
     private List<DateItem> dateItemList;
     private TextView currentMonthYearTextView;
+    private RecyclerView routinesRecyclerView; // New RecyclerView for routines
+    private RoutinesAdapter routinesAdapter; // Adapter for displaying routines
+    private List<TaskModel> routines; // List to hold fetched routines
+    private DatabaseReference mDatabase; // Database reference for Firebase
+    private FirebaseAuth mAuth; // Firebase Auth instance
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_routine, container, false); // Inflate the layout
+        View view = inflater.inflate(R.layout.fragment_routine, container, false);
 
         // Initialize your views
         selectedDateTextView = view.findViewById(R.id.selectedDateTextView);
-        currentMonthYearTextView = view.findViewById(R.id.currentMonthYearTextView); // Initialize month and year TextView
+        currentMonthYearTextView = view.findViewById(R.id.currentMonthYearTextView);
         calendarRecyclerView = view.findViewById(R.id.calendarRecyclerView);
+        routinesRecyclerView = view.findViewById(R.id.recyclerView); // Initialize routines RecyclerView
+
+        // Initialize Firebase
+        mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         // Get dates for the current month
         dateItemList = getDatesForCurrentMonth();
 
-        // Set the LayoutManager programmatically
+        // Set the LayoutManager for the calendar
         calendarRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
 
-        // Initialize and set the adapter
+        // Initialize and set the calendar adapter
         calendarAdapter = new CalendarAdapter(dateItemList, dateItem -> {
             selectedDateTextView.setText("Selected Date: " + dateItem.getDate() + " (" + dateItem.getDay() + ")");
         });
 
         calendarRecyclerView.setAdapter(calendarAdapter);
+
+        // Set up the routines RecyclerView
+        routinesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        routines = new ArrayList<>();
+        routinesAdapter = new RoutinesAdapter(routines); // Create the adapter
+        routinesRecyclerView.setAdapter(routinesAdapter); // Set the adapter for routines RecyclerView
 
         // Display current month and year
         displayCurrentMonthAndYear();
