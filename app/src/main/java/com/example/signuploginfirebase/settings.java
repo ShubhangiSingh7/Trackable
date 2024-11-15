@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
@@ -21,11 +22,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class settings extends Fragment { // Updated class name to follow Java naming conventions
 
     private GoogleSignInClient gClient; // Google Sign-In client
-    ToggleButton toggleButton;
+    private ToggleButton toggleButton;
+    private TextView usernameTextView;  // TextView to display username
 
     @Nullable
     @Override
@@ -36,6 +40,18 @@ public class settings extends Fragment { // Updated class name to follow Java na
 
         // Initialize the logout button
         Button logout = view.findViewById(R.id.logout); // Ensure this ID matches your layout
+        usernameTextView = view.findViewById(R.id.userName); // Ensure the ID matches the TextView in your layout
+
+        // Retrieve and display the current user's username
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            String displayName = user.getDisplayName(); // Get the username (display name)
+            if (displayName != null) {
+                usernameTextView.setText(displayName); // Set username in TextView
+            } else {
+                usernameTextView.setText("No Username Set"); // Handle case if no username
+            }
+        }
 
         // Initialize Google Sign-In options and client
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -87,9 +103,6 @@ public class settings extends Fragment { // Updated class name to follow Java na
             }
         });
 
-
         return view; // Return the inflated view
-
-
     }
 }

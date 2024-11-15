@@ -24,9 +24,9 @@
     </item>
 
     <item
-        android:id="@+id/profile"
-        android:title="Profile"
-        android:icon="@drawable/download__1_">
+        android:id="@+id/news"
+        android:title="Articles"
+        android:icon="@drawable/baseline_news">
 
     </item>
 

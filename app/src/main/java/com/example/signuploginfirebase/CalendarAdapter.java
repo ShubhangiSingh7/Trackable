@@ -11,65 +11,64 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHolder> {
-    private List<DateItem> dateItems;
-    private OnDateClickListener onDateClickListener;
-    private int selectedPosition = -1; // Track selected position
+public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder> {
 
-    public interface OnDateClickListener {
-        void onDateClick(DateItem dateItem);
+    private List<DateItem> dateItemList;
+    private OnDateClickListener dateClickListener;
+
+    public CalendarAdapter(List<DateItem> dateItemList, OnDateClickListener dateClickListener) {
+        this.dateItemList = dateItemList;
+        this.dateClickListener = dateClickListener;
     }
 
-    public CalendarAdapter(List<DateItem> dateItems, OnDateClickListener listener) {
-        this.dateItems = dateItems;
-        this.onDateClickListener = listener;
-    }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public CalendarViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_date, parent, false);
-        return new ViewHolder(view);
+        return new CalendarViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        DateItem dateItem = dateItems.get(position);
+    public void onBindViewHolder(@NonNull CalendarViewHolder holder, int position) {
+        DateItem dateItem = dateItemList.get(position);
         holder.dateTextView.setText(dateItem.getDate());
         holder.dayTextView.setText(dateItem.getDay());
 
-        // Highlight the current date
-        if (dateItem.isCurrentDate()) {
-            holder.itemView.setBackgroundColor(Color.CYAN); // Change color to highlight
-            holder.dateTextView.setTextColor(Color.BLACK); // Optional: change text color for visibility
-        } else if (selectedPosition == position) { // Highlight selected position
-            holder.itemView.setBackgroundColor(Color.LTGRAY); // Change color for selected item
-            holder.dateTextView.setTextColor(Color.BLACK); // Optional: change text color for visibility
+        if (dateItem.isToday()) {
+            holder.dateTextView.setTextColor(Color.RED); // Highlight today's date in red
         } else {
-            holder.itemView.setBackgroundColor(Color.TRANSPARENT); // Default color
-            holder.dateTextView.setTextColor(Color.GRAY); // Optional: default text color
+            holder.dateTextView.setTextColor(Color.BLACK);
         }
 
-        holder.itemView.setOnClickListener(v -> {
-            selectedPosition = position; // Update selected position
-            onDateClickListener.onDateClick(dateItem); // Call the listener
-            notifyDataSetChanged(); // Refresh the adapter to highlight the new selected item
-        });
+        if (dateItem.isSelected()) {
+            holder.itemView.setBackgroundColor(Color.LTGRAY); // Highlight selected date
+        } else {
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT);
+        }
+
+        // Set the click listener
+        holder.itemView.setOnClickListener(v -> dateClickListener.onDateClick(dateItem));
+
     }
 
     @Override
     public int getItemCount() {
-        return dateItems.size();
+        return dateItemList.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class CalendarViewHolder extends RecyclerView.ViewHolder {
         TextView dateTextView;
         TextView dayTextView;
 
-        ViewHolder(@NonNull View itemView) {
+        public CalendarViewHolder(@NonNull View itemView) {
             super(itemView);
-            dateTextView = itemView.findViewById(R.id.dateTextView);
-            dayTextView = itemView.findViewById(R.id.dayTextView);
+            dateTextView = itemView.findViewById(R.id.dateTextView); // Assuming you have dateTextView in your item layout
+            dayTextView = itemView.findViewById(R.id.dayTextView); // Assuming you have dayTextView in your item layout
         }
+    }
+
+    public interface OnDateClickListener {
+        void onDateClick(DateItem dateItem);
     }
 }

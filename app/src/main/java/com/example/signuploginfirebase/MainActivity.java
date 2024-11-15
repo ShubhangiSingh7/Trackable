@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.signuploginfirebase.databinding.ActivityMainBinding;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -29,19 +30,21 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
 import java.util.Calendar;
-
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     TextView userName;
     GoogleSignInClient gClient;
     GoogleSignInOptions gOptions;
-    ActivityMainBinding binding ;
+    ActivityMainBinding binding;
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
-
-
+    private RecyclerView routinesRecyclerView;
+    private List<TaskModel> routines = new ArrayList<>();
+    private RoutinesAdapter routinesAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,15 +59,12 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             new Handler().postDelayed(() -> {
                 replaceFragment(new home()); // Open ProfileFragment after milliseconds
-            }, 1);
+            }, 5);
         }
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             if (item.getItemId() == R.id.routine) {
                 replaceFragment(new routine());
-                return true;
-            } else if (item.getItemId() == R.id.profile) {
-                replaceFragment(new profile());
                 return true;
             } else if (item.getItemId() == R.id.settings) {
                 replaceFragment(new settings());
@@ -74,17 +74,20 @@ public class MainActivity extends AppCompatActivity {
             } else if (item.getItemId() == R.id.home) {
                 replaceFragment(new home());
                 return true;
+            } else if (item.getItemId() == R.id.news) {
+                replaceFragment(new news());
+                return true;
             }
             return false; // If none of the items match
         });
 
-        /*userName = findViewById(R.id.userName);*/
+        //userName = findViewById(R.id.userName);
 
         gOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
         gClient = GoogleSignIn.getClient(this, gOptions);
 
         GoogleSignInAccount gAccount = GoogleSignIn.getLastSignedInAccount(this);
-        if (gAccount != null){
+        if (gAccount != null) {
             String gName = gAccount.getDisplayName();
             userName.setText(gName);
         }
@@ -108,12 +111,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void replaceFragment (Fragment fragment){
+    private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.frame_layout,fragment);
+        fragmentTransaction.replace(R.id.frame_layout, fragment);
+        fragmentTransaction.addToBackStack(null);  // Add to back stack
         fragmentTransaction.commit();
     }
+
     private void showAddTaskDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
@@ -128,95 +133,110 @@ public class MainActivity extends AppCompatActivity {
         ToggleButton repeatToggle = dialogView.findViewById(R.id.repeat_toggle);
         Button saveTaskButton = dialogView.findViewById(R.id.save_task_button);
 
-        // Set Date Picker listener
+        // Get today's date in the same format for comparison
+        Calendar today = Calendar.getInstance();
+        final int currentYear = today.get(Calendar.YEAR);
+        final int currentMonth = today.get(Calendar.MONTH);
+        final int currentDay = today.get(Calendar.DAY_OF_MONTH);
+
         selectDateButton.setOnClickListener(v -> {
             Calendar calendar = Calendar.getInstance();
             DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.this,
                     (view, year, month, dayOfMonth) -> {
-                        String selectedDate = dayOfMonth + "/" + (month + 1) + "/" + year;
+                        // Format day and month to have leading zero if needed
+                        String formattedDay = String.format("%02d", dayOfMonth);
+                        String formattedMonth = String.format("%02d", month + 1); // month + 1 because Calendar month is 0-indexed
+                        String selectedDate = formattedDay + "/" + formattedMonth + "/" + year;
                         selectDateButton.setText(selectedDate);
+
+                        // Check if the selected date is before today
+                        if (year < currentYear || (year == currentYear && month < currentMonth) || (year == currentYear && month == currentMonth && dayOfMonth < currentDay)) {
+                            // Show a message if the selected date is in the past
+                            Toast.makeText(MainActivity.this, "You cannot select a past date", Toast.LENGTH_SHORT).show();
+                        }
                     },
-                    calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+                    currentYear, currentMonth, currentDay);
+
+            // Disable past dates in the date picker
+            datePickerDialog.getDatePicker().setMinDate(today.getTimeInMillis());
             datePickerDialog.show();
         });
 
-        // Set Time Picker listener
+        // Set Time Picker listener with AM/PM option
         selectTimeButton.setOnClickListener(v -> {
             Calendar calendar = Calendar.getInstance();
             TimePickerDialog timePickerDialog = new TimePickerDialog(MainActivity.this,
                     (view, hourOfDay, minute) -> {
-                        String selectedTime = hourOfDay + ":" + String.format("%02d", minute);
+                        // Convert 24-hour format to 12-hour format with AM/PM
+                        boolean isPM = (hourOfDay >= 12);
+                        int displayHour = (hourOfDay == 0 || hourOfDay == 12) ? 12 : hourOfDay % 12;
+                        String amPm = isPM ? "PM" : "AM";
+                        String selectedTime = String.format("%02d:%02d %s", displayHour, minute, amPm);
                         selectTimeButton.setText(selectedTime);
                     },
-                    calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
+                    calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false);  // 'false' for 12-hour format
             timePickerDialog.show();
         });
 
-        // Set Repeat Toggle Button (optional)
+        // Set Repeat Toggle Button
         repeatToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                repeatToggle.setTextOn("Weekly");
-            } else {
-                repeatToggle.setTextOff("No Repeat");
-            }
+            repeatToggle.setText(isChecked ? "Weekly" : "No Repeat");
         });
 
-        // Save Task button functionality
+        // Initialize and show the dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
         saveTaskButton.setOnClickListener(v -> {
-            String title = taskTitle.getText().toString();
-            String description = taskDescription.getText().toString();
-            String date = selectDateButton.getText().toString();
-            String time = selectTimeButton.getText().toString();
+            // Get input values from UI components
+            String title = taskTitle.getText().toString().trim();
+            String description = taskDescription.getText().toString().trim();
+            String date = selectDateButton.getText().toString().trim();
+            String time = selectTimeButton.getText().toString().trim();
             boolean repeatWeekly = repeatToggle.isChecked();
 
-            if (!title.isEmpty() && !description.isEmpty() && !date.equals("Select Date") && !time.equals("Select Time")) {
-                // Save task to Firebase (call your Firebase method here)
-                addTaskToFirebase(title, description, date, time, repeatWeekly);
+            // Check if the required fields are filled
+            if (!title.isEmpty() && !description.isEmpty() && !date.isEmpty() && !date.equals("Select Date") && !time.isEmpty() && !time.equals("Select Time")) {
+                // Check if the selected date is before today's date
+                String[] dateParts = date.split("/");
+                int selectedDay = Integer.parseInt(dateParts[0]);
+                int selectedMonth = Integer.parseInt(dateParts[1]) - 1;  // month is 0-indexed
+                int selectedYear = Integer.parseInt(dateParts[2]);
+
+                if (selectedYear < currentYear || (selectedYear == currentYear && selectedMonth < currentMonth) || (selectedYear == currentYear && selectedMonth == currentMonth && selectedDay < currentDay)) {
+                    // Show an error message if the date is in the past
+                    Toast.makeText(MainActivity.this, "You cannot select a past date", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Add task to Firebase
+                    addTaskToFirebase(title, description, date, time, repeatWeekly);
+                    dialog.dismiss();  // Dismiss the dialog after saving
+                }
             } else {
+                // Show error message if any field is empty or has a placeholder value
                 Toast.makeText(MainActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             }
         });
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
     }
 
     private void addTaskToFirebase(String title, String description, String date, String time, boolean repeatWeekly) {
-        FirebaseUser user = mAuth.getCurrentUser(); // Get the currently signed-in user
-
-        if (user != null) {
-            String userId = user.getUid(); // Securely fetch the user ID
-
-            // Generate a unique task ID
+        // Get the user ID from FirebaseAuth and store task in the database
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
             String taskId = mDatabase.child("users").child(userId).child("routines").push().getKey();
-
-            // Create a task model object
-            TaskModel newTask = new TaskModel(title, description, date, time, repeatWeekly);
-
-            // Add the task to the user's routines in Firebase
-            mDatabase.child("users").child(userId).child("routines").child(taskId)
-                    .setValue(newTask)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
+            boolean isCompleted = false;
+            TaskModel newTask = new TaskModel(title, description, date, time, repeatWeekly, isCompleted, taskId, 0);
+            if (taskId != null) {
+                mDatabase.child("users").child(userId).child("routines").child(date).push().setValue(newTask)
+                        .addOnSuccessListener(aVoid -> {
+                            // Task added successfully
                             Toast.makeText(MainActivity.this, "Task added successfully", Toast.LENGTH_SHORT).show();
-                            // Clear the fields after successfully adding the task
-                            /*taskTitle.setText(""); // Clear the task title
-                            taskDescription.setText(""); // Clear the task description
-                            selectDateButton.setText("Select Date"); // Reset the date button
-                            selectTimeButton.setText("Select Time"); // Reset the time button
-                            repeatToggle.setChecked(false); // Reset the toggle button*/
-
-                        } else {
+                        })
+                        .addOnFailureListener(e -> {
+                            // Failed to add task
                             Toast.makeText(MainActivity.this, "Failed to add task", Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(MainActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    });
-        } else {
-            Toast.makeText(MainActivity.this, "User is not authenticated", Toast.LENGTH_SHORT).show();
+                        });
+            }
         }
     }
-
 }
-
