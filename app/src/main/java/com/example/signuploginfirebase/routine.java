@@ -23,6 +23,7 @@ import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
+import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class routine extends Fragment implements RoutinesAdapter.TaskCompletionC
 
     private MaterialCalendarView calendarView;
     private TextView selectedDateTextView;
+    private TextView currentMonthYearTextView;
     private RoutinesAdapter routinesAdapter;
     private List<TaskModel> routines = new ArrayList<>();
     private DatabaseReference mDatabase;
@@ -47,6 +49,7 @@ public class routine extends Fragment implements RoutinesAdapter.TaskCompletionC
         calendarView = view.findViewById(R.id.calendarView);
         RecyclerView routinesRecyclerView = view.findViewById(R.id.routinesRecyclerView);
         selectedDateTextView = view.findViewById(R.id.selectedDateTextView);
+        currentMonthYearTextView=view.findViewById(R.id.currentMonthYearTextView);
 
         // Set up RecyclerView for displaying routines
         routinesAdapter = new RoutinesAdapter(routines, this);
@@ -59,6 +62,12 @@ public class routine extends Fragment implements RoutinesAdapter.TaskCompletionC
         // Load routines and decorate dates
         //loadRoutineDatesWithLines();
 
+        // Set the current month and year at startup
+        updateMonthYear(calendarView.getCurrentDate());
+
+        // Add listener to detect month changes
+        calendarView.setOnMonthChangedListener((widget, date) -> updateMonthYear(date));
+
         calendarView.setOnDateChangedListener((widget, date, selected) -> {
             String selectedDate = date.getDay() + "/" + (date.getMonth() + 1) + "/" + date.getYear();
             selectedDateTextView.setText(selectedDate);
@@ -66,6 +75,15 @@ public class routine extends Fragment implements RoutinesAdapter.TaskCompletionC
         });
 
         return view;
+    }
+
+    private void updateMonthYear(CalendarDay date) {
+        // Get the full month name
+        String monthName = new DateFormatSymbols().getMonths()[date.getMonth()];
+        // Combine month name and year
+        String monthYear = monthName + " " + date.getYear();
+        // Set it to the TextView
+        currentMonthYearTextView.setText(monthYear);
     }
 
     private void highlightToday() {
