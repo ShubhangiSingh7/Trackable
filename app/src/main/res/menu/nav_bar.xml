@@ -24,8 +24,8 @@
     </item>
 
     <item
-        android:id="@+id/news"
-        android:title="Articles"
+        android:id="@+id/meter"
+        android:title="Meter"
         android:icon="@drawable/baseline_news">
 
     </item>

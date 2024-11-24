@@ -74,8 +74,8 @@ public class MainActivity extends AppCompatActivity {
             } else if (item.getItemId() == R.id.home) {
                 replaceFragment(new home());
                 return true;
-            } else if (item.getItemId() == R.id.news) {
-                replaceFragment(new news());
+            } else if (item.getItemId() == R.id.meter) {
+                replaceFragment(new stress_meter());
                 return true;
             }
             return false; // If none of the items match

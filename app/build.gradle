@@ -58,5 +58,15 @@ dependencies {
     implementation libs.picasso
     implementation libs.material.calendarview
 
+    // Retrofit
+    implementation libs.retrofit
+    implementation libs.converter.gson // Gson converter for Retrofit
+
+    // Gson (optional if not using the converter-gson)
+    implementation libs.gson
+
+    // OkHttp (for logging network calls)
+    implementation libs.logging.interceptor
+
 }
 

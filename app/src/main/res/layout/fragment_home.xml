@@ -26,8 +26,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:layout_marginTop="40dp"
-                android:text="Welcome !"
+                android:layout_marginTop="20dp"
+                android:text="Hi"
                 android:textSize="30dp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -37,8 +37,8 @@
                 android:id="@+id/userName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="40dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="20dp"
                 android:text="User"
                 android:textSize="30dp"
                 android:textStyle="bold" />
@@ -55,24 +55,212 @@
             android:layout_marginBottom="20dp"/>
 
     </LinearLayout>
-    
-    <LinearLayout
-        android:layout_margin="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <include layout="@layout/cardeview1" />
-        <include layout="@layout/cardeview2"/>
 
-    </LinearLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="120dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        <GridLayout
+            android:id="@+id/gridLayout"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="10dp"
+            android:columnCount="2"
+            android:rowCount="2"
+            android:useDefaultMargins="true"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-    </LinearLayout>
+            <!-- Card 1 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/exercise"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_margin="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="5dp"
+                app:cardBackgroundColor="#A7FFEB">
 
+                <ImageView
+                    android:id="@+id/image_exercise"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/exercise" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:layout_alignParentBottom="true"
+                        android:text="Exercise Suggestions"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <!--<TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:gravity="center"
+                        android:layout_alignParentBottom="true"
+                        android:text="Not Sure What to Do Next? Let’s Find the Perfect Exercise for You!"
+                        android:textStyle="italic" />-->
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Card 2 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/nutrition"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_margin="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="5dp"
+                app:cardBackgroundColor="#A7FFEB">
+
+                <ImageView
+                    android:id="@+id/image_nutrition"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/nutrition" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:layout_alignParentBottom="true"
+                        android:text="Nutrition Tips"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <!--<TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:gravity="center"
+                        android:layout_alignParentBottom="true"
+                        android:text="Want to Fuel Your Workout? Discover the Best Nutrition for Your Body!"
+                        android:textStyle="italic" />-->
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Card 3 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/calorie"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_margin="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="5dp"
+                app:cardBackgroundColor="#A7FFEB">
+
+                <ImageView
+                    android:id="@+id/image_calorie"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/calories" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:layout_alignParentBottom="true"
+                        android:text="Calorie Burn"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <!--<TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:gravity="center"
+                        android:layout_alignParentBottom="true"
+                        android:text="Curious About Your Burn? Track Your Calories and See the Results!"
+                        android:textStyle="italic" />-->
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Card 4 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/progress"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_margin="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="5dp"
+                app:cardBackgroundColor="#A7FFEB">
+
+                <ImageView
+                    android:id="@+id/image_progress"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/progress" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:layout_alignParentBottom="true"
+                        android:text="Progress Tracking"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <!--<TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:gravity="center"
+                        android:layout_alignParentBottom="true"
+                        android:text="Ready to Track Your Progress? Watch Your Strength Grow!"
+                        android:textStyle="italic" />-->
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+        </GridLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </LinearLayout>
