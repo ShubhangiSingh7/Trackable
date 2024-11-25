@@ -10,28 +10,10 @@
         android:orientation="vertical">
 
     <EditText
-        android:id="@+id/exercise_name"
+        android:id="@+id/text_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Search by Name" />
-
-    <EditText
-        android:id="@+id/exercise_type"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Search by Type" />
-
-    <EditText
-        android:id="@+id/exercise_muscle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Search by Muscle" />
-
-    <EditText
-        android:id="@+id/exercise_difficulty"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Search by Difficulty" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"

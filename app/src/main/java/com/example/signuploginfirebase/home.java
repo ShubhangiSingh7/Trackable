@@ -70,14 +70,14 @@ public class home extends Fragment {
 
         cardView2.setOnClickListener(v -> {
             v.setTranslationZ(20f);
-            Toast.makeText(requireActivity(), "Card clicked!", Toast.LENGTH_SHORT).show();
             v.postDelayed(() -> v.setTranslationZ(5f), 100);
+            showDialog2();
         });
 
         cardView3.setOnClickListener(v -> {
             v.setTranslationZ(20f);
-            Toast.makeText(requireActivity(), "Card clicked!", Toast.LENGTH_SHORT).show();
             v.postDelayed(() -> v.setTranslationZ(5f), 100);
+            showDialog3();
         });
 
         cardView4.setOnClickListener(v -> {
@@ -98,31 +98,76 @@ public class home extends Fragment {
         return view;
     }
 
-    private void fetchExercises(String name, String type, String muscle, String difficulty, ExerciseAdapter exerciseAdapter) {
+    private void showDialog3() {
+        LayoutInflater inflater1 = getLayoutInflater();
+        View dialogView = inflater1.inflate(R.layout.calorie_box, null);
+
+        EditText ActivityEditText = dialogView.findViewById(R.id.activity_name);
+        EditText WeigthEditText = dialogView.findViewById(R.id.activity_weigth);
+        EditText DurationEditText = dialogView.findViewById(R.id.activity_duration);
+        RecyclerView recyclerView = dialogView.findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        // Initialize the CalorieAdapter
+        List<Calorie> caloriesList = new ArrayList<>();
+        CalorieAdapter calorieAdapter = new CalorieAdapter(caloriesList);
+        recyclerView.setAdapter(calorieAdapter);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        builder.setView(dialogView);
+
+        builder.setPositiveButton("Search", null); // Set null for custom listener
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // Custom click listener for the positive button
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String activity = ActivityEditText.getText().toString().trim();
+            String weightStr = WeigthEditText.getText().toString().trim();
+            String durationStr = DurationEditText.getText().toString().trim();
+
+            if (activity.isEmpty()||weightStr.isEmpty()) {
+                Toast.makeText(requireActivity(), "Please fill in Activity and Weight fields", Toast.LENGTH_SHORT).show();
+            } else {
+                try {
+                    int weight = Integer.parseInt(weightStr);
+                    int duration = Integer.parseInt(durationStr);
+                    fetchCalorie(activity, weight, duration, calorieAdapter);
+                } catch (NumberFormatException e) {
+                    Toast.makeText(requireActivity(), "Enter valid numbers", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void fetchCalorie(String activity,int weight, int duration, CalorieAdapter calorieAdapter) {
         String apiKey = getResources().getString(R.string.api_key);
 
-        ExerciseApiService apiService = RetrofitClient.getRetrofitInstance().create(ExerciseApiService.class);
+        CalorieApiService apiService = RetrofitClient.getRetrofitInstance().create(CalorieApiService.class);
 
-        Call<List<Exercise>> call = apiService.getExercises(name,type, muscle, difficulty, apiKey);
+        Call<List<Calorie>> call = apiService.getCalories(activity,weight,duration,apiKey);
 
-        call.enqueue(new Callback<List<Exercise>>() {
+        call.enqueue(new Callback<List<Calorie>>() {
             @Override
-            public void onResponse(Call<List<Exercise>> call, Response<List<Exercise>> response) {
+            public void onResponse(Call<List<Calorie>> call, Response<List<Calorie>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<Exercise> exercises = response.body();
+                    List<Calorie> calorieList = response.body();
 
-                // Log the fetched exercises
-                for (Exercise exercise : exercises) {
-                    Log.d("Exercise Data", "Name: " + exercise.getName() +
-                            ", Muscles: " + exercise.getMuscles() +
-                            ", Instructions: " + exercise.getInstructions());
-                }
+                    // Log the fetched calorie data
+                    for (Calorie calorie : calorieList) {
+                        Log.d("Calorie Data", "Name: " + calorie.getName() +
+                                ", Calories per Hour: " + calorie.getCalories_per_hour() +
+                                ", Duration: " + calorie.getDuration_minutes() +
+                                ", Total Calories: " + calorie.getTotal_calories());
+                    }
 
-                    if (exercises != null && !exercises.isEmpty()) {
-                        exerciseAdapter.updateExercises(exercises);
-                        Toast.makeText(getActivity(), "Exercises fetched successfully", Toast.LENGTH_SHORT).show();
+                    if (calorieList != null && !calorieList.isEmpty()) {
+                        calorieAdapter.updateCalories(calorieList);  // Update adapter with new data
+                        Toast.makeText(getActivity(), "Calorie data fetched successfully", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(getActivity(), "No exercises found", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "No data found for this query", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Toast.makeText(getActivity(), "API Error: " + response.message(), Toast.LENGTH_SHORT).show();
@@ -130,13 +175,85 @@ public class home extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<List<Exercise>> call, Throwable t) {
+            public void onFailure(Call<List<Calorie>> call, Throwable t) {
                 Toast.makeText(getActivity(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
 
+    private void showDialog2() {
+        LayoutInflater inflater1 = getLayoutInflater();
+        View dialogView = inflater1.inflate(R.layout.nutrition_box, null);
+
+        EditText queryEditText = dialogView.findViewById(R.id.text_input);
+        RecyclerView recyclerView = dialogView.findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        // Initialize the NutritionAdapter
+        List<Nutrition> nutritionList = new ArrayList<>();
+        NutritionAdapter nutritionAdapter = new NutritionAdapter(nutritionList);
+        recyclerView.setAdapter(nutritionAdapter);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        builder.setView(dialogView);
+
+        builder.setPositiveButton("Search", null); // Set null for custom listener
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // Custom click listener for the positive button
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String query = queryEditText.getText().toString().trim();
+
+            if (query.isEmpty()) {
+                Toast.makeText(requireActivity(), "Please enter a food item to search", Toast.LENGTH_SHORT).show();
+            } else {
+                fetchNutrition(query, nutritionAdapter);
+            }
+        });
+    }
+
+    private void fetchNutrition(String query, NutritionAdapter nutritionAdapter) {
+        String apiKey = getResources().getString(R.string.api_key);
+
+        NutritionApiService apiService = RetrofitClient.getRetrofitInstance().create(NutritionApiService.class);
+
+        Call<List<Nutrition>> call = apiService.getNutrition(query, apiKey);
+
+        call.enqueue(new Callback<List<Nutrition>>() {
+            @Override
+            public void onResponse(Call<List<Nutrition>> call, Response<List<Nutrition>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Nutrition> nutritionList = response.body();
+
+                    // Log the fetched nutrition data
+                    for (Nutrition nutrition : nutritionList) {
+                        Log.d("Nutrition Data", "Name: " + nutrition.getName() +
+                                ", Fat: " + nutrition.getFat_total_g() +
+                                ", Carbs: " + nutrition.getCarbohydrates_total_g() +
+                                ", Sugar: " + nutrition.getSugar_g());
+                    }
+
+                    if (nutritionList != null && !nutritionList.isEmpty()) {
+                        nutritionAdapter.updateNutritionList(nutritionList);
+                        Toast.makeText(getActivity(), "Nutrition data fetched successfully", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getActivity(), "No data found for this query", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getActivity(), "API Error: " + response.message(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Nutrition>> call, Throwable t) {
+                Toast.makeText(getActivity(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
     private void showDialog1() {
         LayoutInflater inflater1 = getLayoutInflater();
@@ -176,6 +293,45 @@ public class home extends Fragment {
 
                 // Optionally close the dialog if needed
                 // dialog.dismiss();
+            }
+        });
+    }
+
+
+    private void fetchExercises(String name, String type, String muscle, String difficulty, ExerciseAdapter exerciseAdapter) {
+        String apiKey = getResources().getString(R.string.api_key);
+
+        ExerciseApiService apiService = RetrofitClient.getRetrofitInstance().create(ExerciseApiService.class);
+
+        Call<List<Exercise>> call = apiService.getExercises(name,type, muscle, difficulty, apiKey);
+
+        call.enqueue(new Callback<List<Exercise>>() {
+            @Override
+            public void onResponse(Call<List<Exercise>> call, Response<List<Exercise>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Exercise> exercises = response.body();
+
+                // Log the fetched exercises
+                for (Exercise exercise : exercises) {
+                    Log.d("Exercise Data", "Name: " + exercise.getName() +
+                            ", Muscles: " + exercise.getMuscles() +
+                            ", Instructions: " + exercise.getInstructions());
+                }
+
+                    if (exercises != null && !exercises.isEmpty()) {
+                        exerciseAdapter.updateExercises(exercises);
+                        Toast.makeText(getActivity(), "Exercises fetched successfully", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getActivity(), "No exercises found", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getActivity(), "API Error: " + response.message(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Exercise>> call, Throwable t) {
+                Toast.makeText(getActivity(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

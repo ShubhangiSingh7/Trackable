@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="@color/teal">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="10dp">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Name"/>
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Name"
+                android:layout_marginLeft="10dp"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="fat_total_g"/>
+
+            <TextView
+                android:id="@+id/fat_total_g"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="fat_total_g"
+                android:layout_marginLeft="10dp"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="cholesterol_mg"/>
+
+            <TextView
+                android:id="@+id/cholesterol_mg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="cholesterol_mg"
+                android:layout_marginLeft="10dp"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="carbohydrates_total_g"/>
+
+            <TextView
+                android:id="@+id/carbohydrates_total_g"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="carbohydrates_total_g"
+                android:layout_marginLeft="10dp"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="fiber_g"/>
+
+            <TextView
+                android:id="@+id/fiber_g"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="fiber_g"
+                android:layout_marginLeft="10dp"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="sugar_g"/>
+
+            <TextView
+                android:id="@+id/sugar_g"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="sugar_g"
+                android:layout_marginLeft="10dp"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</androidx.cardview.widget.CardView>

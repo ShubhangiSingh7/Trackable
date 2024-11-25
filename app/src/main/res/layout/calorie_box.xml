@@ -6,36 +6,32 @@
     android:elevation="8dp">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
     <EditText
-        android:id="@+id/exercise_name"
+        android:id="@+id/activity_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Search by Name" />
+        android:hint="Activity Name" />
 
     <EditText
-        android:id="@+id/exercise_type"
+        android:id="@+id/activity_weigth"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Search by Type" />
+        android:hint="Weigth in pounds 50-500" />
 
     <EditText
-        android:id="@+id/exercise_muscle"
+        android:id="@+id/activity_duration"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Search by Muscle" />
-
-    <EditText
-        android:id="@+id/exercise_difficulty"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Search by Difficulty" />
+        android:hint="Duration in min" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>
+
