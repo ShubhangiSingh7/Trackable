@@ -7,7 +7,6 @@ public class TaskModel {
     private boolean isCompleted;
     private boolean repeatWeekly;
     private String taskId;
-    private int duration;
     private String time;
 
     // Default constructor required for calls to DataSnapshot.getValue(TaskModel.class)
@@ -23,7 +22,6 @@ public class TaskModel {
         this.repeatWeekly = repeatWeekly;
         this.isCompleted = isCompleted;
         this.taskId = taskId;
-        this.duration = duration;
     }
 
     // Getter and setter for taskId
@@ -89,12 +87,4 @@ public class TaskModel {
         isCompleted = completed;
     }
 
-    // Getter and setter methods for duration
-    public int getDuration() {
-        return duration;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
 }

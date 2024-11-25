@@ -2,6 +2,7 @@ package com.example.signuploginfirebase;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,11 +62,19 @@ public class RoutinesAdapter extends RecyclerView.Adapter<RoutinesAdapter.Routin
     }
 
     private void deleteRoutine(int position) {
-        // Notify callback to handle task deletion
-        callback.onTaskDeleted(routines.get(position));
-        routines.remove(position);
-        notifyItemRemoved(position);
+        if (position >= 0 && position < routines.size()) {
+            // Proceed with the deletion
+            TaskModel task = routines.get(position);
+            callback.onTaskDeleted(task);  // Inform the callback to delete the task from Firebase
+
+            // Remove from the list and update the RecyclerView
+            routines.remove(position);
+            notifyItemRemoved(position);
+        } else {
+            Log.e("RoutinesAdapter", "Invalid position: " + position);
+        }
     }
+
 
     private void applyStrikethrough(TextView textView, TextView desTextView, TextView timeTextView, boolean isCompleted) {
         if (isCompleted) {

@@ -68,5 +68,7 @@ dependencies {
     // OkHttp (for logging network calls)
     implementation libs.logging.interceptor
 
+    implementation libs.work.runtime
+
 }
 

@@ -172,7 +172,15 @@ public class routine extends Fragment implements RoutinesAdapter.TaskCompletionC
             taskRef.removeValue()
                     .addOnCompleteListener(taskDelete -> {
                         if (taskDelete.isSuccessful()) {
+                            // Show success message
                             Toast.makeText(getActivity(), "Task deleted successfully", Toast.LENGTH_SHORT).show();
+
+                            // Remove the task from the list in the adapter (if you have access to it)
+                            if (getActivity() != null && routinesAdapter != null) {
+                                // Assuming 'routines' is the list in your adapter
+                                routines.remove(task);  // Remove the task from the list
+                                routinesAdapter.notifyDataSetChanged();  // Notify the adapter to update the RecyclerView
+                            }
                         } else {
                             Toast.makeText(getActivity(), "Failed to delete task", Toast.LENGTH_SHORT).show();
                         }
