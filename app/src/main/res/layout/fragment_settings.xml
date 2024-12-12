@@ -69,6 +69,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="THEME "
+                android:textColor="@color/black"
                 android:textStyle="bold"
                 android:paddingHorizontal="20dp"
                 android:background="@drawable/white_box"/>
@@ -78,7 +79,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textOff="Light"
-                android:textOn="dark" />
+                android:textOn="Dark" />
 
         </LinearLayout>
 

@@ -18,6 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="How are you feeling today?"
+            android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_marginBottom="20dp"
@@ -28,6 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Embark on a journey to explore your emotional landscape."
+            android:textColor="@color/black"
             android:textSize="14sp"
             android:gravity="center"/>
 
@@ -76,6 +78,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Stumped"
+            android:textColor="@color/black"
             android:textSize="20sp"
             android:layout_marginTop="20dp"
             android:gravity="center"/>

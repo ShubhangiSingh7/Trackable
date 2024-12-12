@@ -60,7 +60,7 @@ public class home extends Fragment {
         cardView1 = view.findViewById(R.id.exercise);
         cardView2 = view.findViewById(R.id.nutrition);
         cardView3 = view.findViewById(R.id.calorie);
-        cardView4 = view.findViewById(R.id.progress);
+        //cardView4 = view.findViewById(R.id.progress);
 
         cardView1.setOnClickListener(v -> {
             v.setTranslationZ(20f);
@@ -80,20 +80,19 @@ public class home extends Fragment {
             showDialog3();
         });
 
-        cardView4.setOnClickListener(v -> {
+        /*cardView4.setOnClickListener(v -> {
             v.setTranslationZ(20f);
-            Toast.makeText(requireActivity(), "Card clicked!", Toast.LENGTH_SHORT).show();
             v.postDelayed(() -> v.setTranslationZ(5f), 100);
-        });
+        });*/
 
         imageView1 = view.findViewById(R.id.image_exercise);
         imageView2 = view.findViewById(R.id.image_nutrition);
         imageView3 = view.findViewById(R.id.image_calorie);
-        imageView4 = view.findViewById(R.id.image_progress);
+        //imageView4 = view.findViewById(R.id.image_progress);
         imageView1.animate().alpha(0.8f).setDuration(1200).start();
         imageView2.animate().alpha(0.8f).setDuration(1200).start();
         imageView3.animate().alpha(0.8f).setDuration(1200).start();
-        imageView4.animate().alpha(0.8f).setDuration(1200).start();
+        //imageView4.animate().alpha(0.8f).setDuration(1200).start();
 
         return view;
     }

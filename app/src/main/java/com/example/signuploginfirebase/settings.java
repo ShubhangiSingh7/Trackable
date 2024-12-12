@@ -15,6 +15,7 @@ import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -25,11 +26,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class settings extends Fragment { // Updated class name to follow Java naming conventions
+public class settings extends Fragment {
 
-    private GoogleSignInClient gClient; // Google Sign-In client
+    private GoogleSignInClient gClient;
     private ToggleButton toggleButton;
-    private TextView usernameTextView;  // TextView to display username
+    private TextView usernameTextView;
 
     @Nullable
     @Override
@@ -39,23 +40,19 @@ public class settings extends Fragment { // Updated class name to follow Java na
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
         // Initialize the logout button
-        Button logout = view.findViewById(R.id.logout); // Ensure this ID matches your layout
-        usernameTextView = view.findViewById(R.id.userName); // Ensure the ID matches the TextView in your layout
+        Button logout = view.findViewById(R.id.logout);
+        usernameTextView = view.findViewById(R.id.userName);
 
         // Retrieve and display the current user's username
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            String displayName = user.getDisplayName(); // Get the username (display name)
-            if (displayName != null) {
-                usernameTextView.setText(displayName); // Set username in TextView
-            } else {
-                usernameTextView.setText("No Username Set"); // Handle case if no username
-            }
+            String displayName = user.getDisplayName();
+            usernameTextView.setText(displayName != null ? displayName : "No Username Set");
         }
 
         // Initialize Google Sign-In options and client
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail() // Request additional options as necessary
+                .requestEmail()
                 .build();
         gClient = GoogleSignIn.getClient(requireActivity(), gso);
 
@@ -63,23 +60,19 @@ public class settings extends Fragment { // Updated class name to follow Java na
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Access SharedPreferences
                 SharedPreferences preferences = requireActivity().getSharedPreferences("checkbox", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putBoolean("rememberMe", false);
                 editor.apply();
 
-                // Log out from Google Sign-In
                 gClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            // Start the LoginActivity after signing out
                             Intent intent = new Intent(requireActivity(), LoginActivity.class);
                             startActivity(intent);
-                            requireActivity().finish(); // Finish the current activity
+                            requireActivity().finish();
                         } else {
-                            // Handle sign-out failure (optional)
                             Log.e("SettingsFragment", "Sign-out failed");
                         }
                     }
@@ -87,22 +80,34 @@ public class settings extends Fragment { // Updated class name to follow Java na
             }
         });
 
+        // Initialize the theme toggle button
         toggleButton = view.findViewById(R.id.toggleButton);
+
+        // Check the current theme preference and set the toggle button state
+        SharedPreferences preferences = requireActivity().getSharedPreferences("theme_pref", Context.MODE_PRIVATE);
+        boolean isDarkMode = preferences.getBoolean("dark_mode", false);
+        toggleButton.setChecked(isDarkMode);
 
         // Set an OnCheckedChangeListener to handle the toggle button's state change
         toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putBoolean("dark_mode", isChecked);
+                editor.apply();
+
+                // Apply the theme dynamically
                 if (isChecked) {
-                    // Code to execute when toggle button is ON
-                    toggleButton.setText("ON");
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                 } else {
-                    // Code to execute when toggle button is OFF
-                    toggleButton.setText("OFF");
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                 }
+
+                // Optional: Recreate the activity to apply changes immediately
+                requireActivity().recreate();
             }
         });
 
-        return view; // Return the inflated view
+        return view;
     }
 }

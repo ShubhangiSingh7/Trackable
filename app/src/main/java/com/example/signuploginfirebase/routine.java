@@ -2,12 +2,14 @@ package com.example.signuploginfirebase;
 
 import android.os.Bundle;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -52,12 +54,12 @@ public class routine extends Fragment implements RoutinesAdapter.TaskCompletionC
         currentMonthYearTextView=view.findViewById(R.id.currentMonthYearTextView);
 
         // Set up RecyclerView for displaying routines
-        routinesAdapter = new RoutinesAdapter(routines, this);
+        routinesAdapter = new RoutinesAdapter(routines, this,getContext());
         routinesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         routinesRecyclerView.setAdapter(routinesAdapter);
 
-        // Highlight today's date
-        highlightToday();
+        // Highlight today's date and set it as selected
+        highlightTodayAndSetDefaultDate();
 
         // Load routines and decorate dates
         //loadRoutineDatesWithLines();
@@ -69,13 +71,32 @@ public class routine extends Fragment implements RoutinesAdapter.TaskCompletionC
         calendarView.setOnMonthChangedListener((widget, date) -> updateMonthYear(date));
 
         calendarView.setOnDateChangedListener((widget, date, selected) -> {
-            String selectedDate = date.getDay() + "/" + (date.getMonth() + 1) + "/" + date.getYear();
+            String day = String.format("%02d", date.getDay());
+            String month = String.format("%02d", date.getMonth() + 1); // Month is zero-based
+            String selectedDate = day + "/" + month + "/" + date.getYear();
             selectedDateTextView.setText(selectedDate);
             loadRoutinesForDate(selectedDate);
         });
 
         return view;
     }
+
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Initialize the adapter here to ensure getContext() is not null
+        if (getContext() != null) {
+            routinesAdapter = new RoutinesAdapter(routines, this, getContext());
+            RecyclerView routinesRecyclerView = view.findViewById(R.id.routinesRecyclerView);
+            routinesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            routinesRecyclerView.setAdapter(routinesAdapter);
+        } else {
+            // Handle the case where context is null (optional)
+            Toast.makeText(getActivity(), "Context is unavailable", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
     private void updateMonthYear(CalendarDay date) {
         // Get the full month name
@@ -86,9 +107,22 @@ public class routine extends Fragment implements RoutinesAdapter.TaskCompletionC
         currentMonthYearTextView.setText(monthYear);
     }
 
-    private void highlightToday() {
+    private void highlightTodayAndSetDefaultDate() {
         CalendarDay today = CalendarDay.today();
 
+        // Set today's date as selected in the calendar
+        calendarView.setSelectedDate(today);
+
+        // Format today's date with leading zeros if necessary
+        String day = String.format("%02d", today.getDay());
+        String month = String.format("%02d", today.getMonth() + 1);  // Month is zero-based
+        String selectedDate = day + "/" + month + "/" + today.getYear();
+        selectedDateTextView.setText(selectedDate);
+
+        // Optionally, load routines for today's date
+        loadRoutinesForDate(selectedDate);
+
+        // Highlight today's date with custom styling (optional)
         DayViewDecorator decorator = new DayViewDecorator() {
             @Override
             public boolean shouldDecorate(CalendarDay day) {
@@ -110,39 +144,64 @@ public class routine extends Fragment implements RoutinesAdapter.TaskCompletionC
             String userId = user.getUid();
             DatabaseReference routinesRef = mDatabase.child("users").child(userId).child("routines").child(selectedDate);
 
+            // Clear any existing routines before loading new data
             routines.clear();
+
+            // Fetch routines from Firebase
             routinesRef.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     DataSnapshot result = task.getResult();
                     if (result != null && result.exists()) {
+                        Log.d("loadRoutines", "Routines found: " + result.getChildrenCount());
+                        // Process each routine in the snapshot
                         for (DataSnapshot snapshot : result.getChildren()) {
                             TaskModel routine = snapshot.getValue(TaskModel.class);
                             if (routine != null) {
                                 routines.add(routine);
                             }
                         }
+                        // Notify the adapter that data has been updated
                         routinesAdapter.notifyDataSetChanged();
+
+                        // Show message if no routines are available
                         showNoRoutinesMessage(false);
                     } else {
+                        Log.d("loadRoutines", "No routines for this date: " + selectedDate);
                         showNoRoutinesMessage(true);
                     }
                 } else {
+                    // Handle the case when fetching data failed
+                    Log.e("loadRoutines", "Failed to get data: " + task.getException());
                     Toast.makeText(getActivity(), "Failed to load routines", Toast.LENGTH_SHORT).show();
+                    showNoRoutinesMessage(true);
                 }
             }).addOnFailureListener(e -> {
+                // Handle any failure during the data fetch operation
+                Log.e("loadRoutines", "Error: ", e);
                 Toast.makeText(getActivity(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                showNoRoutinesMessage(true);
             });
+        } else {
+            // Handle the case when the user is not logged in
+            Toast.makeText(getActivity(), "User is not logged in", Toast.LENGTH_SHORT).show();
         }
     }
 
+
     private void showNoRoutinesMessage(boolean show) {
-        TextView noRoutinesMessage = getView().findViewById(R.id.noRoutinesMessage);
-        if (show) {
-            noRoutinesMessage.setVisibility(View.VISIBLE);
-        } else {
-            noRoutinesMessage.setVisibility(View.GONE);
+        // Make sure that the view is not null before accessing it
+        if (getView() != null) {
+            TextView noRoutinesTextView = getView().findViewById(R.id.noRoutinesMessage);
+            if (noRoutinesTextView != null) {
+                if (show) {
+                    noRoutinesTextView.setVisibility(View.VISIBLE);
+                } else {
+                    noRoutinesTextView.setVisibility(View.GONE);
+                }
+            }
         }
     }
+
 
     @Override
     public void onTaskCompletionChanged(TaskModel task) {

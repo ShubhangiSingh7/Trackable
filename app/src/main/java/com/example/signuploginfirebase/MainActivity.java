@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,6 +20,7 @@ import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -57,6 +59,16 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        // Load theme preference early
+        SharedPreferences preferences = getSharedPreferences("theme_pref", MODE_PRIVATE);
+        boolean isDarkMode = preferences.getBoolean("dark_mode", false);
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -197,6 +209,9 @@ public class MainActivity extends AppCompatActivity {
             timePickerDialog.show();
         });
 
+        // Create the dialog so it can be referenced inside the listener
+        AlertDialog dialog = builder.create();
+
         saveTaskButton.setOnClickListener(v -> {
             String title = taskTitle.getText().toString().trim();
             String description = taskDescription.getText().toString().trim();
@@ -249,6 +264,8 @@ public class MainActivity extends AppCompatActivity {
                 addTaskToFirebase(title, description, date, time, repeatWeekly);
                 scheduleNotification(MainActivity.this, title, triggerTimeInMillis);
 
+                // Dismiss the dialog after saving the task
+                dialog.dismiss();
             } catch (NumberFormatException e) {
                 Toast.makeText(MainActivity.this, "Invalid date or time format", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
@@ -256,7 +273,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Show the dialog
-        AlertDialog dialog = builder.create();
         dialog.show();
     }
 
@@ -281,9 +297,6 @@ public class MainActivity extends AppCompatActivity {
         WorkManager.getInstance(context).enqueue(workRequest);
 
     }
-
-
-
 
     private void addTaskToFirebase(String title, String description, String date, String time, boolean repeatWeekly) {
         // Get the current user from FirebaseAuth

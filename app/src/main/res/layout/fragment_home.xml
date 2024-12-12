@@ -28,6 +28,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="20dp"
                 android:text="Hi"
+                android:textColor="@color/black"
                 android:textSize="30dp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -40,6 +41,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="20dp"
                 android:text="User"
+                android:textColor="@color/black"
                 android:textSize="30dp"
                 android:textStyle="bold" />
 
@@ -50,6 +52,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Say goodbye to procrastination and hello to progress!"
+            android:textColor="@color/black"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="50dp"
             android:layout_marginBottom="20dp"/>
@@ -104,6 +107,7 @@
                         android:gravity="center"
                         android:layout_alignParentBottom="true"
                         android:text="Exercise Suggestions"
+                        android:textColor="@color/black"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -150,6 +154,7 @@
                         android:gravity="center"
                         android:layout_alignParentBottom="true"
                         android:text="Nutrition Tips"
+                        android:textColor="@color/black"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -195,7 +200,8 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:layout_alignParentBottom="true"
-                        android:text="Calorie Burn"
+                        android:text="Calories Burn"
+                        android:textColor="@color/black"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -213,7 +219,7 @@
             </androidx.cardview.widget.CardView>
 
             <!-- Card 4 -->
-            <androidx.cardview.widget.CardView
+            <!--<androidx.cardview.widget.CardView
                 android:id="@+id/progress"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
@@ -243,7 +249,7 @@
                         android:layout_alignParentBottom="true"
                         android:text="Progress Tracking"
                         android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold" />-->
 
                     <!--<TextView
                         android:layout_width="match_parent"
@@ -254,9 +260,9 @@
                         android:text="Ready to Track Your Progress? Watch Your Strength Grow!"
                         android:textStyle="italic" />-->
 
-                </RelativeLayout>
+            <!--    </RelativeLayout>
 
-            </androidx.cardview.widget.CardView>
+            </androidx.cardview.widget.CardView>-->
 
         </GridLayout>
 
