@@ -45,15 +45,19 @@ public class SignUpActivity extends AppCompatActivity {
                 String password = signupPassword.getText().toString().trim();
                 String username = username_email.getText().toString().trim();
 
-                if (email.isEmpty()){
+                if (email.isEmpty()) {
                     signupEmail.setError("Email cannot be empty");
                     return;
                 }
-                if (password.isEmpty()){
+                if (password.isEmpty()) {
                     signupPassword.setError("Password cannot be empty");
                     return;
                 }
-                if (username.isEmpty()){
+                if (!isValidPassword(password)) {
+                    signupPassword.setError("Password must be at least 8 characters long, include at least 1 number, and 1 special character.");
+                    return;
+                }
+                if (username.isEmpty()) {
                     username_email.setError("Username cannot be empty");
                     return;
                 }
@@ -102,5 +106,11 @@ public class SignUpActivity extends AppCompatActivity {
                 startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
             }
         });
+    }
+
+    // Validate password: at least 8 characters, 1 number, 1 special character
+    private boolean isValidPassword(String password) {
+        String passwordPattern = "^(?=.*[0-9])(?=.*[!@#$%^&*(),.?\":{}|<>]).{8,}$";
+        return password.matches(passwordPattern);
     }
 }

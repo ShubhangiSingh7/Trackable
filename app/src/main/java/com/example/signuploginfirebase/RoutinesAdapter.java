@@ -172,11 +172,23 @@ public class RoutinesAdapter extends RecyclerView.Adapter<RoutinesAdapter.Routin
             @Override
             public void onFinish() {
                 task.setCompleted(true);
-                applyStrikethrough(holder.titleTextView, holder.desTextView, holder.timerCountdownTextView, true, holder.durationTextView);
+
+                // Temporarily remove listener before updating checkbox
+                holder.taskCheckbox.setOnCheckedChangeListener(null);
+                holder.taskCheckbox.setChecked(true); // Programmatically check the box
+                holder.taskCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    task.setCompleted(isChecked);
+                    applyStrikethrough(holder.titleTextView, holder.desTextView, holder.TimeTextView, isChecked, holder.durationTextView);
+                    callback.onTaskCompletionChanged(task);
+                    updateRoutineCheckInDatabase(task);
+                });
+
+                applyStrikethrough(holder.titleTextView, holder.desTextView, holder.TimeTextView, true, holder.durationTextView);
 
                 updateRoutineCheckInDatabase(task);
                 holder.timerCountdownTextView.setVisibility(View.GONE);
 
+                // Play sound when timer ends
                 MediaPlayer mediaPlayer = MediaPlayer.create(context, R.raw.timer_end_sound);
                 mediaPlayer.start();
                 mediaPlayer.setOnCompletionListener(mp -> mp.release());
@@ -184,6 +196,7 @@ public class RoutinesAdapter extends RecyclerView.Adapter<RoutinesAdapter.Routin
                 Toast.makeText(context, "Timer finished for " + task.getTitle(), Toast.LENGTH_SHORT).show();
                 clearTimerState(task.getTaskId());
             }
+
         };
 
         timer.start();

@@ -5,15 +5,17 @@
 
     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
         android:id="@+id/calendarView"
-        android:background="@drawable/teal_box"
         android:layout_width="match_parent"
         android:layout_height="300dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:mcv_showOtherDates="all"
         app:mcv_selectionColor="@color/lavender"
         app:mcv_headerTextAppearance="@color/black"
         app:mcv_weekDayTextAppearance="@color/black"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="10dp"/>
+        android:background="@drawable/teal_box"
+        android:layout_margin="16dp" />
 
     <LinearLayout
         android:layout_width="match_parent"

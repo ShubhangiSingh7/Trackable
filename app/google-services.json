@@ -1,8 +1,9 @@
 {
   "project_info": {
     "project_number": "255151755108",
+    "firebase_url": "https://signup-login-firebase-c93ac-default-rtdb.firebaseio.com",
     "project_id": "signup-login-firebase-c93ac",
-    "storage_bucket": "signup-login-firebase-c93ac.appspot.com"
+    "storage_bucket": "signup-login-firebase-c93ac.firebasestorage.app"
   },
   "client": [
     {
@@ -12,7 +13,20 @@
           "package_name": "com.example.signuploginfirebase"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "255151755108-33kuaff4iv03de46ruk6l3od8h70lou5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.signuploginfirebase",
+            "certificate_hash": "fa64aae80ea32a5b64c8de99484a7c5ce81067c0"
+          }
+        },
+        {
+          "client_id": "255151755108-r4qgkofvo6fqoen0jlk34ogp4a5putsh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAZRO6W0hBCt90JQr_PaeBkCuvaICV-MFM"
@@ -20,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "255151755108-r4qgkofvo6fqoen0jlk34ogp4a5putsh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

@@ -10,16 +10,12 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -29,197 +25,160 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.GoogleAuthProvider;
 
 public class LoginActivity extends AppCompatActivity {
 
     private EditText loginEmail, loginPassword;
-    private TextView signupRedirectText;
+    private TextView signupRedirectText, forgotPassword;
     private Button loginButton;
     private FirebaseAuth auth;
-    TextView forgotPassword;
-    GoogleSignInButton googleBtn;
-    GoogleSignInOptions gOptions;
-    GoogleSignInClient gClient;
-    CheckBox remember;
+    private GoogleSignInClient googleSignInClient;
+    private CheckBox rememberMeCheckBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        // Initialize views
         loginEmail = findViewById(R.id.login_email);
         loginPassword = findViewById(R.id.login_password);
         loginButton = findViewById(R.id.login_button);
         signupRedirectText = findViewById(R.id.signUpRedirectText);
         forgotPassword = findViewById(R.id.forgot_password);
-        googleBtn = findViewById(R.id.googleBtn);
-        remember = findViewById(R.id.checkbox);
+        GoogleSignInButton googleSignInButton = findViewById(R.id.googleBtn);
+        rememberMeCheckBox = findViewById(R.id.checkbox);
 
+        // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance();
 
-        // Check if "Remember Me" was previously checked
+        // Initialize Google Sign-In
+        GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id)) // Add your web client ID here
+                .requestEmail()
+                .build();
+        googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
+
+        // Check if the user selected "Remember Me"
         SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
-        boolean isRemembered = preferences.getBoolean("rememberMe", false);
-        if (isRemembered) {
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
+        if (preferences.getBoolean("rememberMe", false)) {
+            navigateToMainActivity();
         }
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String email = loginEmail.getText().toString();
-                String pass = loginPassword.getText().toString();
+        // Login button click listener
+        loginButton.setOnClickListener(v -> {
+            String email = loginEmail.getText().toString().trim();
+            String password = loginPassword.getText().toString().trim();
 
-                if (!email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    if (!pass.isEmpty()) {
-                        auth.signInWithEmailAndPassword(email, pass)
-                                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-                                    @Override
-                                    public void onSuccess(AuthResult authResult) {
-                                        if (remember.isChecked()) {
-                                            // Save "Remember Me" preference
-                                            SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
-                                            SharedPreferences.Editor editor = preferences.edit();
-                                            editor.putBoolean("rememberMe", true);
-                                            editor.apply();
-                                        }
-                                        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                        finish();
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(LoginActivity.this, "Login Failed", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                    } else {
-                        loginPassword.setError("Empty fields are not allowed");
+            if (TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                loginEmail.setError("Enter a valid email");
+            } else if (TextUtils.isEmpty(password)) {
+                loginPassword.setError("Password cannot be empty");
+            } else {
+                loginWithEmailPassword(email, password);
+            }
+        });
+
+        // Google Sign-In button click listener
+        googleSignInButton.setOnClickListener(v -> {
+            Intent signInIntent = googleSignInClient.getSignInIntent();
+            googleSignInLauncher.launch(signInIntent);
+        });
+
+        // Redirect to Sign-Up activity
+        signupRedirectText.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, SignUpActivity.class)));
+
+        // Handle Forgot Password
+        forgotPassword.setOnClickListener(v -> showForgotPasswordDialog());
+
+        // Handle "Remember Me" checkbox
+        rememberMeCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean("rememberMe", isChecked);
+            editor.apply();
+        });
+    }
+
+    private void loginWithEmailPassword(String email, String password) {
+        auth.signInWithEmailAndPassword(email, password)
+                .addOnSuccessListener(authResult -> {
+                    if (rememberMeCheckBox.isChecked()) {
+                        SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.putBoolean("rememberMe", true);
+                        editor.apply();
                     }
-                } else if (email.isEmpty()) {
-                    loginEmail.setError("Empty fields are not allowed");
-                } else {
-                    loginEmail.setError("Please enter correct email");
-                }
-            }
-        });
+                    Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                    navigateToMainActivity();
+                })
+                .addOnFailureListener(e -> Toast.makeText(LoginActivity.this, "Login Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
 
-        signupRedirectText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
-            }
-        });
-
-        forgotPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                View dialogView = getLayoutInflater().inflate(R.layout.dialog_forgot, null);
-                EditText emailBox = dialogView.findViewById(R.id.emailBox);
-
-                builder.setView(dialogView);
-                AlertDialog dialog = builder.create();
-
-                dialogView.findViewById(R.id.btnReset).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        String userEmail = emailBox.getText().toString();
-
-                        if (TextUtils.isEmpty(userEmail) || !Patterns.EMAIL_ADDRESS.matcher(userEmail).matches()) {
-                            Toast.makeText(LoginActivity.this, "Enter a valid registered email id", Toast.LENGTH_SHORT).show();
-                            return;
+    private final ActivityResultLauncher<Intent> googleSignInLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
+                    try {
+                        GoogleSignInAccount account = task.getResult(ApiException.class);
+                        if (account != null) {
+                            authenticateWithFirebase(account.getIdToken());
                         }
-                        auth.sendPasswordResetEmail(userEmail).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(LoginActivity.this, "Check your email", Toast.LENGTH_SHORT).show();
-                                    dialog.dismiss();
-                                } else {
-                                    Toast.makeText(LoginActivity.this, "Unable to send, failed", Toast.LENGTH_SHORT).show();
-                                }
+                    } catch (ApiException e) {
+                        Toast.makeText(LoginActivity.this, "Google Sign-In Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+    private void authenticateWithFirebase(String idToken) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+        auth.signInWithCredential(credential)
+                .addOnSuccessListener(authResult -> {
+                    Toast.makeText(LoginActivity.this, "Google Sign-In Successful", Toast.LENGTH_SHORT).show();
+                    navigateToMainActivity();
+                })
+                .addOnFailureListener(e -> Toast.makeText(LoginActivity.this, "Firebase Authentication Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
+    private void showForgotPasswordDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_forgot, null);
+        EditText emailBox = dialogView.findViewById(R.id.emailBox);
+
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+
+        dialogView.findViewById(R.id.btnReset).setOnClickListener(v -> {
+            String email = emailBox.getText().toString().trim();
+            if (TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Toast.makeText(this, "Enter a valid email", Toast.LENGTH_SHORT).show();
+            } else {
+                auth.sendPasswordResetEmail(email)
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(this, "Password reset email sent", Toast.LENGTH_SHORT).show();
+                                dialog.dismiss();
+                            } else {
+                                Toast.makeText(this, "Failed to send reset email", Toast.LENGTH_SHORT).show();
                             }
                         });
-                    }
-                });
-                dialogView.findViewById(R.id.btnCancel).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dialog.dismiss();
-                    }
-                });
-                if (dialog.getWindow() != null) {
-                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-                }
-                dialog.show();
             }
         });
 
-        // Google Sign-In
-        gOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
-        gClient = GoogleSignIn.getClient(this, gOptions);
+        dialogView.findViewById(R.id.btnCancel).setOnClickListener(v -> dialog.dismiss());
 
-        GoogleSignInAccount gAccount = GoogleSignIn.getLastSignedInAccount(this);
-        if (gAccount != null) {
-            finish();
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(intent);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
         }
+        dialog.show();
+    }
 
-        ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        if (result.getResultCode() == Activity.RESULT_OK) {
-                            Intent data = result.getData();
-                            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-                            try {
-                                task.getResult(ApiException.class);
-                                finish();
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                startActivity(intent);
-                            } catch (ApiException e) {
-                                Toast.makeText(LoginActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    }
-                });
-
-        googleBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent signInIntent = gClient.getSignInIntent();
-                activityResultLauncher.launch(signInIntent);
-            }
-        });
-
-        // Handle CheckBox for remembering user
-        remember.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putBoolean("rememberMe", true);
-                    editor.apply();
-                    Toast.makeText(LoginActivity.this, "Checked", Toast.LENGTH_SHORT).show();
-                } else {
-                    SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putBoolean("rememberMe", false);
-                    editor.apply();
-                    Toast.makeText(LoginActivity.this, "Unchecked", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+    private void navigateToMainActivity() {
+        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+        finish();
     }
 }

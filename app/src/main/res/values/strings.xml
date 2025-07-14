@@ -4,5 +4,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="my_string">News &amp; Blogs</string>"
     <string name="api_key">3rDcHswroAmjewUDXSzfdQ==6VIz5xL5X8zcOH9q</string>
+    <string name="default_web_client_id">255151755108-r4qgkofvo6fqoen0jlk34ogp4a5putsh.apps.googleusercontent.com</string>
 
 </resources>
