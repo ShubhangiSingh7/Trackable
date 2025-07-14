@@ -29,16 +29,6 @@
 
 ---
 
-## 📸 Screenshots
-
-> ![Login Screen](<img width="498" height="888" alt="image" src="https://github.com/user-attachments/assets/33ef737f-47d4-42a2-969d-95c449e10da2" />)  
-> ![Home Screen](<img width="494" height="884" alt="image" src="https://github.com/user-attachments/assets/17050c55-6e26-4f12-a2a8-0f04b8668772" />)
-> ![Calender View](<img width="500" height="897" alt="image" src="https://github.com/user-attachments/assets/20ed1c13-fca7-4f5f-899b-1fff7bebbb23" />)
-> ![Add new task View](<img width="500" height="889" alt="image" src="https://github.com/user-attachments/assets/883f2bf3-b34a-4daf-9d55-c048bb929778" />)
-> ![Log out Screen](<img width="524" height="900" alt="image" src="https://github.com/user-attachments/assets/cf308be9-5dd1-4f1a-8756-7c2c89d60d1c" />)
-
----
-
 ## 🛠️ Tech Stack
 
 - **Language:** Java  
