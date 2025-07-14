@@ -42,7 +42,7 @@
 ## 📦 Setup Instructions
 
 1. Clone the repository:
-   git clone https://github.com/yourusername/Trackable.git
+   git clone https://github.com/ShubhangiSingh7/Trackable.git
    
 3. Open the project in Android Studio
 
